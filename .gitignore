@@ -1,0 +1,61 @@
+# Project related
+.cpcache/**
+/db/
+/data/
+/base/
+env.list
+base_state.edn
+partition_offsets.edn
+version.edn
+
+# Java related
+pom.xml
+pom.xml.asc
+*jar
+*.class
+
+# Leiningen
+classes/
+lib/
+native/
+checkouts/
+target/
+deps
+.lein-*
+repl-port
+.nrepl-port
+.repl
+.rebl
+
+# Temp Files
+*.orig
+*~
+.*.swp
+.*.swo
+*.tmp
+*.bak
+
+# OS X
+.DS_Store
+
+# Logging
+*.log
+/logs/
+
+# Builds
+out/
+build/
+
+# Jena 
+/tdb/**
+# genegraph-assembly.ttl
+
+# Lucene
+lucene_index/
+suggestions/
+
+# intellij
+.idea/
+
+# saves
+tdb.baseline/
