@@ -13,7 +13,7 @@
   "The defaults to configure a build."
   {:class-dir  "target/classes"
    :java-opts  ["-Dclojure.main.report=stderr"]
-   :main       'watcher
+   :main       'watcher.watcher
    :path       "target"
    :project    "deps.edn"
    :target-dir "target/classes"
