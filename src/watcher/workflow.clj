@@ -9,14 +9,6 @@
 (def location (delay (getenv "GCP_WORKFLOW_LOCATION"))) ;; example "us-central1"
 (def workflow (delay (getenv "GCP_WORKFLOW_NAME")) ) ;; example "clinvar-ingest"
 
-(defn gcp-workflow-initiation-url []
-  "The URL defined by GCP Workflow to POST newly found Clinvar FTP Files to.
-   Throws an exception if 'GCP_WORKFLOW_INITIATION_UR' is noot defined in the environment."
-  (let [workflow-url (System/getenv "GCP_WORKFLOW_INITIATION_URL")]
-    (if (nil? workflow-url)
-      (throw (Exception. "'GCP_WORKFLOW_INITIATION_URL' not defined in the environment."))
-      workflow-url)))
-
 (comment
   "{\"Name\":\"ClinVarVariationRelease_2023-1209.xml.gz\",\"Size\":3192148421,\"Released\":\"2023-12-10 01:49:23\",\"Last Modified\":\"2023-12-10 01:49:23\",\"Directory\":\"http:\\\\//ftp.ncbi.nlm.nih.gov\\/pub\\/clinvar\\/xml\\/clinvar_variation\\/weekly_release\",\"Release Date\":\"2023-12-09\"}")
 

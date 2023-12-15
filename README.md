@@ -3,7 +3,8 @@ Code for detecting new files on the clinvar ftp site. It works as follows:
 - read the last offset from the confluent cloud clinvar_ftp_watcher topic in the clingen-prod cluster
 - retrieve the date of the last dated file returned
 - use that date to compare against all of the dated files in https://ftp.ncbi.nlm.nih.gov/pub/clinvar/xml/clinvar_variation/weekly_release/
-- when there are more recent dated files, store them in a new message in clinvar_ftp_watcher.
+- when there are more recent dated files, store them in a new message in clinvar_ftp_watcher topic.
+- initiate the clinvar-ingest workflow in google cloud.
 
 The above references to "dated files" are file names in the form ClinVarVariationRelease_YYYY-MMDD.xml.gz. These are the only files currently processed by this code. The weekly_release directory contains the following files:
 - ClinVarVariationRelease_00-latest_weekly.xml.gz - file that is a symbolic link to a dated release file. At the beginning of the month, ClinVar moves all of the dated files for the previous month to the parent clinvar_variation directory. As new weekly dated files are added to the weekly_release directory throught any given month, this file will be symbolically linked to the latest weekly release dated file.
