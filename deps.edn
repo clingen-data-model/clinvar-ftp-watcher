@@ -13,11 +13,14 @@
   org.clojure/data.csv                               {:mvn/version "1.0.1"}
   org.clojure/data.json                              {:mvn/version "2.4.0"}
   org.clojure/tools.build                            {:mvn/version "0.9.0"}
-  com.google.auth/google-auth-library-oauth2-http    {:mvn/version "0.25.5"}
-  com.google.cloud.functions/functions-framework-api {:mvn/version "1.0.4"}
   http-kit/http-kit                                  {:mvn/version "2.6.0"}
   org.clj-commons/hickory                            {:mvn/version "0.7.3" }
-  org.apache.kafka/kafka-clients                     {:mvn/version "3.1.0"}}
+  org.apache.kafka/kafka-clients                     {:mvn/version "3.1.0"}
+  com.google.auth/google-auth-library-oauth2-http    {:mvn/version "1.20.0"}
+  com.google.cloud.functions/functions-framework-api {:mvn/version "1.0.4"}
+  com.google.cloud/google-cloud-workflows            {:mvn/version "2.31.0"}
+  com.google.cloud/google-cloud-workflow-executions  {:mvn/version "2.31.0"}
+  com.taoensso/timbre                                {:mvn/version "6.3.1"}}
  :paths
  ["src"]
  :jvm-opts ["-Dclojure.main.report=stderr"]

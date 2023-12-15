@@ -25,4 +25,18 @@ A new build requires an edit to the cloud run job to update the container image.
 - then click "select" on the latest build
 - click "update" on the cloud run job edit page
 
+Environment Variables:
 
+"DX_JAAS_CONFIG" must be defined, this is the kafka permission string
+
+"CLINVAR_FTP_WATCHER_TOPIC" defaults to 'clinvar_ftp_watcher' when not explicitly defined
+"NCBI_CLINVAR_WEEKLY_FTP_DIR" defaults to "/pub/clinvar/xml/clinvar_variation/weekly_release"
+"NCBI_CLINVAR_FTP_SITE" defaults to "https://ftp.ncbi.nlm.nih.gov"
+
+"GCP_WORKFLOW_PROJECT_ID" this is the GCP Project ID where the workflow resides, such as "clingen-dev"
+"GCP_WORKFLOW_LOCATION" this is the region where the workflow resides, such as "us-central1"
+"GCP_WORKFLOW_NAME" this is the name of the workflow to invoke, such as "clinvar-ingest"
+
+Command Line Arguments:
+--dont-write-to-kafka = do not write the release information to the kafka topic.
+--dont-initiate-workflow = do not make calls to initiate the workflow processing of the clinvar release.

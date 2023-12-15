@@ -7,7 +7,23 @@
            [org.apache.kafka.clients.producer KafkaProducer Producer ProducerRecord]
            [org.apache.kafka.common PartitionInfo TopicPartition]))
 
-(def clinvar-ftp-watcher-topic "clinvar_ftp_watcher")
+;; Sensible defaults
+(def DEFAULT_FTP_WATCHER_TOPIC "clinvar_ftp_watcher")
+
+(defn clinvar-ftp-watcher-topic []
+  "The topic where the results of new files found on the NCBI Clinvar FTP site will be saved.
+   If 'CLINVAR_FTP_WATCHER_TOPIC' is not defined in the environment, this defaults to
+   'clinvar_ftp_watcher'"
+  (let [watcher-topic (System/getenv "CLINVAR_FTP_WATCHER_TOPIC")]
+    (if (nil? watcher-topic)
+      DEFAULT_FTP_WATCHER_TOPIC
+      watcher-topic)))
+
+(defn dx-jaas-config []
+  (let [jaas-config (System/getenv "DX_JAAS_CONFIG")]
+    (if (nil? jaas-config)
+      (throw (Exception. "'DX_JAAS_CONFIG' not defined in environment.")))
+    jaas-config))
 
 (def kafka-config {:common {"ssl.endpoint.identification.algorithm" "https"
                             "sasl.mechanism" "PLAIN"
@@ -15,15 +31,11 @@
                             "bootstrap.servers" "pkc-4yyd6.us-east1.gcp.confluent.cloud:9092"
                             "retry.backoff.ms" "500"
                             "security.protocol" "SASL_SSL"
-                            "sasl.jaas.config" "org.apache.kafka.common.security.plain.PlainLoginModule required username='IJVUJZI3NM2CUYDT' password='nf4M8VLWPXuIbXRhaqDlTK0wphzLxxuN99wQ5UE9uxgHVK7q8h6kRo0q2HLKdnBq';" }
+                            "sasl.jaas.config" (dx-jaas-config)}
                    :consumer {"key.deserializer" "org.apache.kafka.common.serialization.StringDeserializer"
                               "value.deserializer" "org.apache.kafka.common.serialization.StringDeserializer"}
                    :producer {"key.serializer" "org.apache.kafka.common.serialization.StringSerializer"
                               "value.serializer" "org.apache.kafka.common.serialization.StringSerializer"}})
-
-(defn create-clinvar-history
-  []
-  )
 
 (defn client-configuration
   "Create client configuration as properties"
@@ -56,8 +68,8 @@
 (defn get-last-processed
   "Retrieve the last processed message of the kafka topic"
   []
-  (with-open [consumer (topic-consumer clinvar-ftp-watcher-topic)]
-    (let [topic-partitions (topic-partitions consumer clinvar-ftp-watcher-topic)
+  (with-open [consumer (topic-consumer (clinvar-ftp-watcher-topic))]
+    (let [topic-partitions (topic-partitions consumer (clinvar-ftp-watcher-topic))
           _ (.assign consumer topic-partitions)
           [topicPartition, endOffset] (-> (.endOffsets consumer topic-partitions) first)]
       (when (> endOffset 0)
@@ -71,7 +83,7 @@
   "Save the key and value to the kafka topic"
   [key value]
   (with-open [producer (topic-producer)]
-    (let [producer-record (ProducerRecord. clinvar-ftp-watcher-topic key value)]
+    (let [producer-record (ProducerRecord. (clinvar-ftp-watcher-topic) key value)]
       (.send producer producer-record))))
 
 (comment
@@ -80,7 +92,7 @@
                                         "Size" 2287039835,
                                         "Released" "2023-01-09 09:23:44",
                                         "Last Modified" "2023-01-09 09:23:44"
-                                        "Directory" ftpparse/weekly-ftp-dir
+                                        "Directory" ftpparse/weekly-ftp-url
                                         "Release Date" (ftpparse/extract-date-from-file "ClinVarVariationRelease_2023-0107.xml.gz")
                                         }])))
 
