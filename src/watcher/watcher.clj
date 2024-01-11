@@ -72,8 +72,8 @@
    --workflow  - will not initiate the google cloud workflow to process the files
   "
   [& args]
-  (let [write-to-kafka (= -1 (.indexOf args "--kafka"))
-        initiate-workflow (= -1 (.indexOf args "--workflow"))
+  (let [write-to-kafka (= -1 (if (some? args) (.indexOf args "--kafka") -1))
+        initiate-workflow (= -1 (if (some? args) (.indexOf args "--workflow") -1))
         files (-> (stream/get-last-processed)
                   get-last-processed-date
                   get-latest-files-since)
