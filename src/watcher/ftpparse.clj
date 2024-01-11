@@ -165,8 +165,9 @@
            (map fix-ftp-map)))))
 
 (defn ftp-since
-  "Return files from WEEKLY-URL more recent than INSTANT in a vector."
-  [instant]
+  "Return files from currently on the ncbi weekly url site
+  more recent than instant in a vector."
+  [^java.util.Date instant]
   (letfn [(since? [file]
             (apply < (map inst-ms [instant (file "Last Modified")])))
           (filename? [file]
