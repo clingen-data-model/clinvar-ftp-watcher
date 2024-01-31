@@ -14,25 +14,37 @@
   (:import [java.text SimpleDateFormat]))
 
 
+;; Sensible defults
+(def DEFAULT_NCBI_FTP_URL "https://ftp.ncbi.nlm.nih.gov")
+(def DEFAULT_CLINVAR_WEEKLY_DIR "/pub/clinvar/xml/VCV_xml_old_format/weekly_release")
+
 (s/def ::table
   (s/and sequential?
          (partial every? sequential?)
          #(== 1 (count (set (map count %))))
          #(== (count (set (first %))) (count (first %)))))
 
-(def ^:private ftp-site
-  "FTP site of the National Library of Medicine."
-  "https://ftp.ncbi.nlm.nih.gov")
+(defn ftp-site []
+  "FTP site of the National Library of Medicine. If no value is defined in the environment
+   for 'NCBI_CLINVAR_FTP_SITE' defaults to DEFAULT_NCBI_FTP_URL"
+  (let [ncbi-ftp (System/getenv "NCBI_CLINVAR_FTP_SITE")]
+    (if (nil? ncbi-ftp)
+      DEFAULT_NCBI_FTP_URL
+      ncbi-ftp)))
 
 ;; The FTP/HTTP server requires a final / on URLs.
 ;;
-(def weekly-ftp-dir
-  "The weekly release directory."
-  "/pub/clinvar/xml/clinvar_variation/weekly_release")
+(defn weekly-ftp-dir []
+  "NCBI's ClinVar weekly release directory. if no value is defined in the environment
+   for 'NCBI_CLINVAR_WEEKLY_FTP_DIR' defaults to DEFAULT_CLINVAR_WEEKLY_DIR"
+  (let [weekly-dir (System/getenv "NCBI_CLINVAR_WEEKLY_FTP_DIR")]
+    (if (nil? weekly-dir)
+      DEFAULT_CLINVAR_WEEKLY_DIR
+      weekly-dir)))
 
 (def weekly-ftp-url
   "The weekly_release ftp URL."
-  (str ftp-site "/"  weekly-ftp-dir))
+  (str (ftp-site) (weekly-ftp-dir)))
 
 (defn ^:private tabulate
   "Return a vector of vectors from FILE as a Tab-Separated-Values table."
@@ -152,8 +164,9 @@
            (map fix-ftp-map)))))
 
 (defn ftp-since
-  "Return files from WEEKLY-URL more recent than INSTANT in a vector."
-  [instant]
+  "Return files from currently on the ncbi weekly url site
+  more recent than instant in a vector."
+  [^java.util.Date instant]
   (letfn [(since? [file]
             (apply < (map inst-ms [instant (file "Last Modified")])))
           (filename? [file]

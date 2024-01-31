@@ -17,7 +17,11 @@
    :path       "target"
    :project    "deps.edn"
    :target-dir "target/classes"
-   :uber-file  "target/watcher.jar"})
+   :uber-file  "target/watcher.jar"
+   :exclude    ["META-INF/license/LICENSE.aix-netbsd.txt"
+                "META-INF/license/LICENSE.boringssl.txt"
+                "META-INF/license/LICENSE.mvn-wrapper.txt"
+                "META-INF/license/LICENSE.tomcat-native.txt"]})
 
 (defn uber
   "Throw or make an uberjar from source."
@@ -32,5 +36,5 @@
     (b/uber        project)))
 
 (comment
-  (uber {})
-  tbl)
+  (uber 
+  tbl))
