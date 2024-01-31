@@ -16,8 +16,7 @@
 
 ;; Sensible defults
 (def DEFAULT_NCBI_FTP_URL "https://ftp.ncbi.nlm.nih.gov")
-(def DEFAULT_CLINVAR_WEEKLY_DIR "/pub/clinvar/xml/clinvar_variation/weekly_release")
-
+(def DEFAULT_CLINVAR_WEEKLY_DIR "/pub/clinvar/xml/VCV_xml_old_format/weekly_release")
 
 (s/def ::table
   (s/and sequential?
@@ -27,7 +26,7 @@
 
 (defn ftp-site []
   "FTP site of the National Library of Medicine. If no value is defined in the environment
-   for 'NCBI_CLINVAR_FTP_SITE' defaults to 'https://ftp.ncbi.nlm.nih.gov'"
+   for 'NCBI_CLINVAR_FTP_SITE' defaults to DEFAULT_NCBI_FTP_URL"
   (let [ncbi-ftp (System/getenv "NCBI_CLINVAR_FTP_SITE")]
     (if (nil? ncbi-ftp)
       DEFAULT_NCBI_FTP_URL
@@ -37,7 +36,7 @@
 ;;
 (defn weekly-ftp-dir []
   "NCBI's ClinVar weekly release directory. if no value is defined in the environment
-   for 'NCBI_CLINVAR_WEEKLY_FTP_DIR' defaults to '/pub/clinvar/xml/clinvar_variation/weekly_release'"
+   for 'NCBI_CLINVAR_WEEKLY_FTP_DIR' defaults to DEFAULT_CLINVAR_WEEKLY_DIR"
   (let [weekly-dir (System/getenv "NCBI_CLINVAR_WEEKLY_FTP_DIR")]
     (if (nil? weekly-dir)
       DEFAULT_CLINVAR_WEEKLY_DIR
