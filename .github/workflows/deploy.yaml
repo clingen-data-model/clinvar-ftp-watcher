@@ -22,7 +22,7 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: projects/522856288592/locations/global/workloadIdentityPools/clingen-actions-pool/providers/clingen-github-actions
-          service_account: clinvar-ftp-watcher@clingen-dx.iam.gserviceaccount.com
+          service_account: clinvar-ingest-deployment@clingen-dx.iam.gserviceaccount.com
 
       - name: "setup gcloud sdk"
         uses: google-github-actions/setup-gcloud@v2
