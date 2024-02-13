@@ -1,0 +1,37 @@
+# clinvar-ftp-watcher github action
+# Build the docker container
+# Deploy in us-central1 as a cloud-run job that runs hourly
+#
+name: Deployment
+on: [push]
+
+permissions:
+  id-token: write
+      
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+      
+      - name: authenticate to google cloud
+        id: "auth"
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/522856288592/locations/global/workloadIdentityPools/clingen-actions-pool/providers/clingen-github-actions
+          service_account: clinvar-ftp-watcher@clingen-dx.iam.gserviceaccount.com
+
+      - name: "setup gcloud sdk"
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Build and push image
+        run: |-
+          gcloud builds submit --quiet --substitutions="COMMIT_SHA=${{ github.event.workflow_run.head_sha }}" --config .cloudbuild/docker.cloudbuild.yaml --gcs-log-dir=gs://clinvar-ingest/build/logs .
+
+
+
+
+
