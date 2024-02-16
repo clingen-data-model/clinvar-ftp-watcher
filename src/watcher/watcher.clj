@@ -1,14 +1,14 @@
 (ns watcher.watcher
   "Source for cloud function that periodicly watches the clivar ftp dir
   for new files. State is maintained in a kafka topic."
-  (:require [watcher.ftpparse   :as ftpparse]
-            [watcher.stream     :as stream]
-            [watcher.util       :as util]
-            [watcher.workflow   :as workflow]
-            [clojure.data.json  :as json]
-            [clojure.instant    :refer [read-instant-date]]
-            [clojure.pprint     :refer [pprint]]
-            [taoensso.timbre    :refer [log info warn error]])
+  (:require [watcher.ftpparse     :as ftpparse]
+            [watcher.stream       :as stream]
+            [watcher.util         :as util]
+            [watcher.cloudrunjob  :as job]
+            [clojure.data.json    :as json]
+            [clojure.instant      :refer [read-instant-date]]
+            [clojure.pprint       :refer [pprint]]
+            [taoensso.timbre      :refer [log info warn error]])
   (:import [java.util Date])
   (:gen-class))
 
@@ -65,15 +65,15 @@
 (defn -main
   "Main processing point: reads the last message from the clinvar-ftp-watcher topic,
   gets the last dated file, reads the clinvar ftp site looking for files with newer dates,
-  and writes the newer files to the clinvar-ftp-watcher topic and initiates the google workflow
-  for each found file.
+  and writes the newer files to the clinvar-ftp-watcher topic and initiates the google cloud
+  run job for each found file.
   Args:
    --kafka     - will not write newly found files to the kafka stream
-   --workflow  - will not initiate the google cloud workflow to process the files
+   --job       - will not initiate the google cloud job to process the files
   "
   [& args]
   (let [write-to-kafka (= -1 (if (some? args) (.indexOf args "--kafka") -1))
-        initiate-workflow (= -1 (if (some? args) (.indexOf args "--workflow") -1))
+        initiate-job (= -1 (if (some? args) (.indexOf args "--job") -1))
         files (-> (stream/get-last-processed)
                   get-last-processed-date
                   get-latest-files-since)
@@ -86,12 +86,11 @@
           (stream/save-to-topic date-processed (json/write-str file-details))
           (info "Updated kafka topic with new file details."))
         (info "No new file information written to kafka."))
-      (if initiate-workflow
-        (doseq [release file-details]
-          (let [payload (json/write-str release)
-                initiated-workflow (workflow/initiate-workflow payload)]
-            (info "Initiated workflow " initiated-workflow " with payload " payload)))
-        (info "No workflows initiated.")))))
+      (if initiate-job
+        (doseq [release-map file-details]
+          (let [initiated-job (job/initiate-cloud-run-job release-map)]
+            (info "Initiated cloud run job " initiated-job " with payload " release-map)))
+        (info "Cloud run job not initiated.")))))
 
 
 (comment
