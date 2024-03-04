@@ -9,7 +9,7 @@
 
 (def DEFAULT_GCP_PROJECT_ID "clingen-dev")
 (def DEFAULT_GCP_LOCATION "us-central1") 
-(def DEFAULT_GCP_JOB_NAME "clinvar-ftp-watcher")
+(def DEFAULT_GCP_JOB_NAME "clinvar-ingest-main")
 
 ;; TODO s/b a macro?
 (defn gcp-project-id []
@@ -66,7 +66,6 @@
                                   .build))
       .build))
 
-
 (defn initiate-cloud-run-job [^clojure.lang.IPersistentMap payload]
   "Pass a ClinVar release payload map to initiate the google cloud run job to ingest."
   (let [jobs-client (JobsClient/create)]
@@ -77,15 +76,8 @@
             run-job-request (-> (RunJobRequest/newBuilder)
                                 (.setName job-name)
                                 (.setOverrides overrides)
-                                .build)
-            execution (-> (.runJobAsync jobs-client run-job-request)
-                          .get)
-            success-count (.getSucceededCount execution)
-            start-time (.getSeconds (.getStartTime execution))
-            end-time (.getSeconds (.getCompletionTime execution))
-            tot-time (- end-time start-time)]
-        (info (str "Cloud Run Job: " job-name " executed in " tot-time " seconds. Result: "
-                   (if success-count "SUCCEEDED" "FAILED"))))
+                                .build)]
+        (.runJobAsync jobs-client run-job-request))
       (catch Exception e (throw e))
       (finally (.close jobs-client)))))
 

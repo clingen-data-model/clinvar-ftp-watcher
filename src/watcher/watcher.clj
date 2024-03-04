@@ -88,8 +88,8 @@
         (info "No new file information written to kafka."))
       (if initiate-job
         (doseq [release-map file-details]
-          (let [initiated-job (job/initiate-cloud-run-job release-map)]
-            (info "Initiated cloud run job " initiated-job " with payload " release-map)))
+          (let [initiated-job (future (job/initiate-cloud-run-job release-map))]
+            (info "Initiated cloud run job " (job/ gcp-job-name) " with payload " release-map)))
         (info "Cloud run job not initiated.")))))
 
 
