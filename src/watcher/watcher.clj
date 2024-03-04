@@ -96,7 +96,7 @@
           ;; https://cloud.google.com/java/docs/reference/google-cloud-run/latest/com.google.cloud.run.v2.JobsClient#com_google_cloud_run_v2_JobsClient_JobsClient_com_google_cloud_run_v2_JobsSettings_
           ;;
           (let [initiated-job (future (job/initiate-cloud-run-job release-map))]
-            (info "Initiated cloud run job " (job/ gcp-job-name) " with payload " release-map)))
+            (info "Initiated cloud run job " (job/gcp-job-name) " with payload " release-map)))
         (info "Cloud run job not initiated.")))))
 
 
