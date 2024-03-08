@@ -60,7 +60,9 @@ gcloud builds submit \
 # Deploy job
 
 gcloud run jobs create $instance_name \
+    --cpu=1 \
     --image=$image \
+    --max-retries=0 \
     --region=$region \
     --service-account=$deployment_service_account \
     --set-secrets=DX_JAAS_CONFIG=dx-prod-jaas:latest
