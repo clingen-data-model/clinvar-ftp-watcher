@@ -62,5 +62,7 @@ gcloud builds submit \
 gcloud run jobs create $instance_name \
     --image=$image \
     --region=$region \
-    --service-account=$deployment_service_account #\
-    # --set-env-vars=CLINVAR_FTP_WATCHER_BUCKET=$clinvar_ftp_watcher_bucket
+    --service-account=$deployment_service_account \
+    --set-secrets=DX_JAAS_CONFIG=dx-prod-jaas:latest
+
+
