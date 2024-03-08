@@ -18,13 +18,16 @@ echo "Commit: $commit"
 
 set -u
 
-instance_name="clinvar-ftp-watcher-${branch}"
+if [ "$branch" == "main" ]; then
+    instance_name="clinvar-ftp-watcher"
+else
+    instance_name="clinvar-ftp-watcher-${branch}"
+fi
 clinvar_ftp_watcher_bucket="clinvar-ftp-watcher"
 
 region="us-central1"
 # project=$(gcloud config get project)
-image_tag=workflow-py-$commit
-image=gcr.io/clingen-dev/clinvar-ftp-watcher:$image_tag
+image=gcr.io/clingen-dev/clinvar-ftp-watcher:$commit
 deployment_service_account=clinvar-ftp-watcher-deployment@clingen-dev.iam.gserviceaccount.com
 
 
@@ -48,7 +51,7 @@ tar --no-xattrs -c \
     | gzip --fast > archive.tar.gz
 
 gcloud builds submit \
-    --substitutions="COMMIT_SHA=${image_tag}" \
+    --substitutions="COMMIT_SHA=${commit}" \
     --config .cloudbuild/docker-build-dev.cloudbuild.yaml \
     --gcs-log-dir=gs://${clinvar_ftp_watcher_bucket}/build/logs \
     archive.tar.gz
@@ -59,5 +62,5 @@ gcloud builds submit \
 gcloud run jobs create $instance_name \
     --image=$image \
     --region=$region \
-    --service-account=$pipeline_service_account \
-    --set-env-vars=CLINVAR_FTP_WATCHER_BUCKET=$clinvar_ingest_bucket
+    --service-account=$deployment_service_account #\
+    # --set-env-vars=CLINVAR_FTP_WATCHER_BUCKET=$clinvar_ftp_watcher_bucket
