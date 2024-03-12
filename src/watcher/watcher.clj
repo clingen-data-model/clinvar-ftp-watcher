@@ -79,7 +79,7 @@
                   get-latest-files-since)
         file-details (process-file-details files)
         date-processed (str (Date.))]
-    (info (str "Run on " date-processed " processed " (count files) " files."))
+    (info (str "Run on " date-processed " processed " (count (:files files)) " files."))
     (when (new-files? files)
       (if write-to-kafka
         (do
@@ -105,18 +105,6 @@
     (doseq [release file-details]
       ((workflow/initiate-workflow (json/write-str release))))))
 
-(comment
-  "https://cloud.google.com/secret-manager/docs/reference/rpc/google.cloud.secrets.v1beta1#createsecretrequest"
-  "clj -M -m injest slack"
-  "https://stackoverflow.com/questions/58409161/channel-not-found-error-while-sending-a-message-to-myself"
-  "https://cloud.google.com/functions/docs/writing/write-event-driven-functions"
-  "https://github.com/broadinstitute/tgg-terraform-modules/tree/main/scheduled-cloudfunction"
-  "gcloud functions runtimes list --project=clingen-dev --region=us-central1"
-  "gcloud functions deploy clinvar-ftp-watcher --allow-unauthenticated --region=us-central1 --runtime=java17 --trigger-topic=clinvar-ftp-watcher --source=target --entry-point=" ;; move up - move to terraform
-)
-
-(comment {"Mon Jan 01 01:45:40 UTC 2024"
- "[{\"Name\":\"ClinVarVariationRelease_2024-0107.xml.gz\",\"Size\":3294923883,\"Released\":\"2024-01-07 20:04:48\",\"Last Modified\":\"2024-01-07 20:04:48\",\"Directory\":\"\\/pub\\/clinvar\\/xml\\/clinvar_variation\\/weekly_release\",\"Release Date\":\"2024-01-07\"}]"})
 
 (comment
   (-> (ftpparse/ftp-since #inst "2023-12-30")))
