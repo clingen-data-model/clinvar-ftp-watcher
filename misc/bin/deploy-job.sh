@@ -53,7 +53,7 @@ gcloud builds submit \
 ################################################################
 # Deploy job
 
-gcloud run jobs create $instance_name \
+gcloud run jobs replace $instance_name \
     --cpu=1 \
     --image=$image \
     --max-retries=0 \
