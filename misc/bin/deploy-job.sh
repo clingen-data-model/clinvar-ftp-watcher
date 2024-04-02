@@ -52,8 +52,14 @@ gcloud builds submit \
 
 ################################################################
 # Deploy job
-
-gcloud run jobs update $instance_name \
+if gcloud run jobs list --region us-central1 | awk '{print $2}' | grep "^$instance_name$"  ; then
+    echo "Cloud Run Job $instance_name already exists - updating it"
+    command="update"
+else
+    echo "Cloud Run Job $instance_name doesn't exist - creating it"
+    command="create"
+fi
+gcloud run jobs $command $instance_name \
     --cpu=1 \
     --image=$image \
     --max-retries=0 \
