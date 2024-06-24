@@ -9,7 +9,7 @@
            [org.apache.kafka.common PartitionInfo TopicPartition]))
 
 ;; Sensible defaults
-(def DEFAULT_FTP_WATCHER_TOPIC "clinvar_ftp_watcher")
+(def DEFAULT_FTP_WATCHER_TOPIC "clinvar-vcv-ftp-watcher")
 
 (defn clinvar-ftp-watcher-topic []
   "The topic where the results of new files found on the NCBI Clinvar FTP site will be saved.
@@ -21,16 +21,16 @@
       watcher-topic)))
 
 (def kafka-config (delay {:common {"ssl.endpoint.identification.algorithm" "https"
-                             "sasl.mechanism" "PLAIN"
-                             "request.timeout.ms" "20000"
-                             "bootstrap.servers" "pkc-4yyd6.us-east1.gcp.confluent.cloud:9092"
-                             "retry.backoff.ms" "500"
-                             "security.protocol" "SASL_SSL"
-                             "sasl.jaas.config" (util/getenv "DX_JAAS_CONFIG")}
-                    :consumer {"key.deserializer" "org.apache.kafka.common.serialization.StringDeserializer"
-                               "value.deserializer" "org.apache.kafka.common.serialization.StringDeserializer"}
-                    :producer {"key.serializer" "org.apache.kafka.common.serialization.StringSerializer"
-                               "value.serializer" "org.apache.kafka.common.serialization.StringSerializer"}}))
+                                   "sasl.mechanism" "PLAIN"
+                                   "request.timeout.ms" "20000"
+                                   "bootstrap.servers" "pkc-4yyd6.us-east1.gcp.confluent.cloud:9092"
+                                   "retry.backoff.ms" "500"
+                                   "security.protocol" "SASL_SSL"
+                                   "sasl.jaas.config" (util/getenv "DX_JAAS_CONFIG")}
+                          :consumer {"key.deserializer" "org.apache.kafka.common.serialization.StringDeserializer"
+                                     "value.deserializer" "org.apache.kafka.common.serialization.StringDeserializer"}
+                          :producer {"key.serializer" "org.apache.kafka.common.serialization.StringSerializer"
+                                     "value.serializer" "org.apache.kafka.common.serialization.StringSerializer"}}))
 
 (defn client-configuration
   "Create client configuration as properties"
@@ -58,7 +58,7 @@
   []
   (let [cluster-config (client-configuration @kafka-config)
         producer-config (merge-with into (:common cluster-config) (:producer cluster-config))]
-    (KafkaProducer. producer-config))) 
+    (KafkaProducer. producer-config)))
 
 ;; TODO - Re-evaluate if this is current - especially the ncbi ftp host should be here?
 ;; sample kafka topic message:
@@ -77,10 +77,10 @@
           [topicPartition, endOffset] (-> (.endOffsets consumer topic-partitions) first)]
       (when (> endOffset 0)
         (.seek consumer (first topic-partitions) (dec endOffset))
-          (let [consumerRecord (-> (.poll consumer 1000) last)
-                date (.key consumerRecord)
-                files (.value consumerRecord)]
-            {date files})))))
+        (let [consumerRecord (-> (.poll consumer 1000) last)
+              date (.key consumerRecord)
+              files (.value consumerRecord)]
+          {date files})))))
 
 (defn save-to-topic
   "Save the key and payload to the kafka topic."
@@ -91,11 +91,5 @@
 
 (comment
   (get-last-processed)
-  (save-to-topic (str (Date.)) (json/write-str [{"Name" "ClinVarVariationRelease_2023-0107.xml.gz",
-                                        "Size" 2287039835,
-                                        "Released" "2023-01-09 09:23:44",
-                                        "Last Modified" "2023-01-09 09:23:44"
-                                        "Directory" ftpparse/weekly-ftp-url
-                                        "Release Date" (ftpparse/extract-date-from-file "ClinVarVariationRelease_2023-0107.xml.gz")
-                                        }])))
+  (save-to-topic (str (java.util.Date.)) (json/write-str [{"Name" "ClinVarRCVRelease_2024-0610.xml.gz", "Size" 4342574098, "Released" "2024-06-12 08:12:12", "Last Modified" "2024-06-12 08:12:12", "Directory" "/pub/clinvar/xml/RCV_release/weekly_release", "Host" "https://ftp.ncbi.nlm.nih.gov", "Release Date" "2024-06-12"}])))
 

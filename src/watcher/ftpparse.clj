@@ -13,10 +13,10 @@
             [org.httpkit.client :as http])
   (:import [java.text SimpleDateFormat]))
 
-
 ;; Sensible defults
 (def DEFAULT_NCBI_FTP_URL "https://ftp.ncbi.nlm.nih.gov")
 (def DEFAULT_CLINVAR_WEEKLY_DIR "/pub/clinvar/xml/VCV_xml_old_format/weekly_release")
+(def DEFAULT_FILE_NAME_BASE "ClinVarVariationRelease")
 
 (s/def ::table
   (s/and sequential?
@@ -31,6 +31,14 @@
     (if (nil? ncbi-ftp)
       DEFAULT_NCBI_FTP_URL
       ncbi-ftp)))
+
+(defn ftp-file-name-base []
+  "FTP file base name. If no value is defined in the environment
+   for 'NCBI_CLINVAR_FILE_NAME_BASE' defaults to DEFAULT_FILE_NAME_BASE"
+  (let [ncbi-file-name-base (System/getenv "NCBI_CLINVAR_FILE_NAME_BASE")]
+    (if (nil? ncbi-file-name-base)
+      DEFAULT_FILE_NAME_BASE
+      ncbi-file-name-base)))
 
 ;; The FTP/HTTP server requires a final / on URLs.
 ;;
@@ -82,6 +90,10 @@
   "And sometimes THIS is how the FTP site timestamps."
   (SimpleDateFormat. "yyyy-MM-dd kk:mm"))
 
+(def ftp-time-ymd
+  "And sometimes THIS is how the FTP site timestamps."
+  (SimpleDateFormat. "yyyy-MM-dd"))
+
 (defn instify
   "Parse string S as a date and return its Instant or NIL."
   [s]
@@ -102,7 +114,7 @@
 (defn extract-date-from-file
   "Extract the date from ClinVarVariationRelease_2020-0602.xml.gz file as 2020-06-02"
   [file]
-  (let [result (re-matches #"ClinVarVariationRelease_(\d\d\d\d)-(\d\d)(\d\d).xml.gz" file)]
+  (let [result (re-matches (re-pattern (str (ftp-file-name-base) "_(\\d\\d\\d\\d)-(\\d\\d)(\\d\\d).xml.gz")) file)]
     (str/join "-" (rest result))))
 
 (defn ^:private fix-ftp-map
@@ -170,10 +182,10 @@
   (letfn [(since? [file]
             (apply < (map inst-ms [instant (file "Last Modified")])))
           (filename? [file]
-            (let [regexp #"ClinVarVariationRelease_\d\d\d\d-\d\d\d\d.xml.gz"]
+            (let [regexp (re-pattern (str (ftp-file-name-base) "_\\d\\d\\d\\d-\\d\\d\\d\\d.xml.gz"))]
               (some? (re-matches regexp (file "Name")))))]
     (->> weekly-ftp-url fetch-ftp parse-ftp rest (filter (every-pred since? filename?)) vec)))
 
 (comment
-  (ftp-since #inst "2023-01-01"))
+  (ftp-since #inst "2024-06-01"))
 
