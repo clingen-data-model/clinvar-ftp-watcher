@@ -58,7 +58,7 @@
                        "Last Modified" (.format ftpparse/ftp-time (entry "Last Modified"))
                        "Directory" (ftpparse/weekly-ftp-dir)
                        "Host" (ftpparse/ftp-site)
-                       "Release Date" (.format ftpparse/ftp-time-ymd (entry "Released"))}))
+                       "Release Date" (ftpparse/extract-date-from-file (entry "Name"))}))
           []
           (:files current)))
 
