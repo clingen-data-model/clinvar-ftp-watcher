@@ -6,8 +6,8 @@
 
 
 (def DEFAULT_GCP_WORKFLOW_PROJECT_ID "clingen-dev")
-(def DEFAULT_GCP_WORKFLOW_LOCATION "us-central1") 
-(def DEFAULT_GCP_WORKFLOW_NAME "clinvar-ingest")
+(def DEFAULT_GCP_WORKFLOW_LOCATION "us-east1") 
+(def DEFAULT_GCP_WORKFLOW_NAME "clinvar-vcv-ingest")
 
 ;; TODO s/b a macro?
 (defn gcp-workflow-project-id []

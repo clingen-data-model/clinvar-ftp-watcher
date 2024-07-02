@@ -101,10 +101,10 @@
 
 
 (comment
-  (let [file-details (process-file-details  (get-latest-files-since #inst "2023-01-06"))]
+  (let [file-details (process-file-details  (get-latest-files-since #inst "2024-06-01"))]
     (doseq [release file-details]
       ((workflow/initiate-workflow (json/write-str release))))))
 
 
 (comment
-  (-> (ftpparse/ftp-since #inst "2023-12-30")))
+  (-> (ftpparse/ftp-since #inst "2024-06-01")))
