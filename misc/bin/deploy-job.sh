@@ -18,10 +18,6 @@ if [ $? -ne 0 ]; then
     exit -1
 fi
 
-if [ -z "$branch" ]; then
-    branch=$(git rev-parse --abbrev-ref HEAD)
-else
-    echo "branch set in environment"
 fi
 if [ -z "$commit" ]; then
     commit=$(git rev-parse HEAD)
@@ -31,6 +27,7 @@ fi
 
 echo "Branch: $branch"
 echo "Commit: $commit"
+echo "Instance name: $instance"
 
 set -ue
 
@@ -100,3 +97,4 @@ fi
 echo "Deployment complete."
 
 
+## TODO add cloud run scheduler command to run when none exists for the project and region
