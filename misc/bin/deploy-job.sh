@@ -32,7 +32,7 @@ set -ue
 
 clinvar_ftp_watcher_bucket="clinvar-ftp-watcher"
 region="us-east1"
-# project=$(gcloud config get project)
+project=$(gcloud config get project)
 image=gcr.io/clingen-dev/clinvar-ftp-watcher:$commit
 deployment_service_account=clinvar-ftp-watcher-deployment@clingen-dev.iam.gserviceaccount.com
 
@@ -89,11 +89,14 @@ echo "${instance}" | grep -i "rcv" > /dev/null
 if [ $? -eq 0 ]; then
     echo "Running the RCV watcher deployment..."
     $rcv_cloud_run_deploy
+    echo "Running RCV cloud run scheduler deployment"
+    # --schedule causes problems unless run as subshell
+    $(gcloud scheduler jobs ${command} http clinvar-rcv-ftp-watcher-scheduler --location ${region} --schedule='50 * * * *' --uri=https://${region}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${project}/jobs/clinvar-rcv-ftp-watcher:run --http-method POST --oauth-service-account-email=cloudrun@${project}.iam.gserviceaccount.com)
 else
     echo "Running the VCV watcher deployment..."
     $vcv_cloud_run_deploy
+    echo "Running VCV cloud run scheduler deployment"
+    # --schedule causes problems unless run as subshell
+    $(gcloud scheduler jobs ${command} http clinvar-vcv-ftp-watcher-scheduler --location ${region} --schedule='45 * * * *' --uri=https://${region}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${project}/jobs/clinvar-vcv-ftp-watcher:run --http-method POST --oauth-service-account-email=cloudrun@${project}.iam.gserviceaccount.com)
 fi
 echo "Deployment complete."
-
-
-## TODO add cloud run scheduler command to run when none exists for the project and region
