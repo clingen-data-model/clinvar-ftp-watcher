@@ -18,7 +18,6 @@ if [ $? -ne 0 ]; then
     exit -1
 fi
 
-fi
 if [ -z "$commit" ]; then
     commit=$(git rev-parse HEAD)
 else
