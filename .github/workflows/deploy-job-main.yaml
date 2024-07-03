@@ -28,15 +28,27 @@ jobs:
       - name: setup gcloud sdk
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: set env vars
+      - name: set env vars vcv
         run: |
           export branch=${{ github.event.workflow_run.head_branch }}
           export commit=${{ github.event.workflow_run.head_sha }}
           echo "branch=$branch" >> $GITHUB_ENV
           echo "commit=$commit" >> $GITHUB_ENV
-          echo "instance_name=clinvar-ftp-watcher-$branch" >> $GITHUB_ENV
+          echo "instance=clinvar-vcv-ftp-watcher" >> $GITHUB_ENV
 
-      - name: build and deploy
+      - name: build and deploy vcv
+        run: |
+          bash misc/bin/deploy-job.sh
+
+      - name: set env vars rcv
+        run: |
+          export branch=${{ github.event.workflow_run.head_branch }}
+          export commit=${{ github.event.workflow_run.head_sha }}
+          echo "branch=$branch" >> $GITHUB_ENV
+          echo "commit=$commit" >> $GITHUB_ENV
+          echo "instance=clinvar-rcv-ftp-watcher" >> $GITHUB_ENV
+
+      - name: build and deploy rcv
         run: |
           bash misc/bin/deploy-job.sh
 

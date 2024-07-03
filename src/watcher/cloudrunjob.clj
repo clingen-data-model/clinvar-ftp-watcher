@@ -8,7 +8,7 @@
 
 
 (def DEFAULT_GCP_PROJECT_ID "clingen-dev")
-(def DEFAULT_GCP_LOCATION "us-central1") 
+(def DEFAULT_GCP_LOCATION "us-east1") 
 (def DEFAULT_GCP_JOB_NAME "clinvar-ingest")
 
 ;; TODO s/b a macro?

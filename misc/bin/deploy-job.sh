@@ -91,8 +91,12 @@ set +e
 
 echo "${instance}" | grep -i "rcv" > /dev/null
 if [ $? -eq 0 ]; then
+    echo "Running the RCV watcher deployment..."
     $rcv_cloud_run_deploy
 else
+    echo "Running the VCV watcher deployment..."
     $vcv_cloud_run_deploy
 fi
+echo "Deployment complete."
+
 
