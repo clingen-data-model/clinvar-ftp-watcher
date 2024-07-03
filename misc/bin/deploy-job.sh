@@ -91,12 +91,12 @@ if [ $? -eq 0 ]; then
     $rcv_cloud_run_deploy
     echo "Running RCV cloud run scheduler deployment"
     # --schedule causes problems unless run as subshell
-    $(gcloud scheduler jobs ${command} http clinvar-rcv-ftp-watcher-scheduler --location ${region} --schedule='50 * * * *' --uri=https://${region}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${project}/jobs/clinvar-rcv-ftp-watcher:run --http-method POST --oauth-service-account-email=cloudrun@${project}.iam.gserviceaccount.com)
+    # $(gcloud scheduler jobs ${command} http clinvar-rcv-ftp-watcher-scheduler --location ${region} --schedule='50 * * * *' --uri=https://${region}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${project}/jobs/clinvar-rcv-ftp-watcher:run --http-method POST --oauth-service-account-email=cloudrun@${project}.iam.gserviceaccount.com)
 else
     echo "Running the VCV watcher deployment..."
     $vcv_cloud_run_deploy
     echo "Running VCV cloud run scheduler deployment"
     # --schedule causes problems unless run as subshell
-    $(gcloud scheduler jobs ${command} http clinvar-vcv-ftp-watcher-scheduler --location ${region} --schedule='45 * * * *' --uri=https://${region}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${project}/jobs/clinvar-vcv-ftp-watcher:run --http-method POST --oauth-service-account-email=cloudrun@${project}.iam.gserviceaccount.com)
+    # $(gcloud scheduler jobs ${command} http clinvar-vcv-ftp-watcher-scheduler --location ${region} --schedule='45 * * * *' --uri=https://${region}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${project}/jobs/clinvar-vcv-ftp-watcher:run --http-method POST --oauth-service-account-email=cloudrun@${project}.iam.gserviceaccount.com)
 fi
 echo "Deployment complete."
