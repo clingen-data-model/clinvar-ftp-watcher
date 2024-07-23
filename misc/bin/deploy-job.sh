@@ -91,12 +91,11 @@ somatic_cloud_run_deploy="${vcv_cloud_run_deploy} \
     --set-env-vars=GCP_WORKFLOW_LOCATION=${region} \
     --set-env-vars=GCP_WORKFLOW_NAME=clinvar-somatic-ingest"
 
-scheduler_command="gcloud scheduler jobs ${command} \
-			 http ${instance} \
-			 --location ${region} \
-			 --uri=https://${region}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${project}/jobs/${instance}:run \
-			 --http-method POST \
-			 --oauth-service-account-email=cloudrun@${project}.iam.gserviceaccount.com "
+scheduler_command="gcloud scheduler jobs ${command} http ${instance} \
+    --location ${region} \
+    --uri=https://${region}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${project}/jobs/${instance}:run \
+    --http-method POST \
+    --oauth-service-account-email=cloudrun@${project}.iam.gserviceaccount.com"
 
 # turn on echo turn of filename expansion of wildcards
 set +e -f
