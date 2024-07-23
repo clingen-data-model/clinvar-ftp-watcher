@@ -12,9 +12,9 @@ if [ -z "$instance" ]; then
     exit -1
 fi
 
-echo "${instance}" | egrep -i "vcv|rcv" > /dev/null
+echo "${instance}" | egrep -i "vcv|rcv|somatic" > /dev/null
 if [ $? -ne 0 ]; then
-    echo "'instance' must have 'rcv' or 'vcv' in the name."
+    echo "'instance' must have 'rcv', 'vcv' or 'somatic' in the name."
     exit -1
 fi
 
@@ -83,20 +83,38 @@ rcv_cloud_run_deploy="${vcv_cloud_run_deploy} \
     --set-env-vars=GCP_WORKFLOW_LOCATION=${region} \
     --set-env-vars=GCP_WORKFLOW_NAME=clinvar-rcv-ingest"
 
-set +e
+# override variant biased env vars with somatic specifics
+somatic_cloud_run_deploy="${vcv_cloud_run_deploy} \
+    --set-env-vars=CLINVAR_FTP_WATCHER_TOPIC=clinvar-somatic-ftp-watcher \
+    --set-env-vars=NCBI_CLINVAR_WEEKLY_FTP_DIR=/pub/clinvar/xml/weekly_release \
+    --set-env-vars=NCBI_CLINVAR_FILE_NAME_BASE=ClinVarVCVRelease \
+    --set-env-vars=GCP_WORKFLOW_LOCATION=${region} \
+    --set-env-vars=GCP_WORKFLOW_NAME=clinvar-somatic-ingest"
 
-echo "${instance}" | grep -i "rcv" > /dev/null
-if [ $? -eq 0 ]; then
+scheduler_command="gcloud scheduler jobs ${command} \
+			 http ${instance} \
+			 --location ${region} \
+			 --uri=https://${region}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${project}/jobs/${instance}:run \
+			 --http-method POST \
+			 --oauth-service-account-email=cloudrun@${project}.iam.gserviceaccount.com "
+
+# turn on echo turn of filename expansion of wildcards
+set +e -f
+
+if [[ ${instance} =~ ^.*rcv.*$ ]]; then
     echo "Running the RCV watcher deployment..."
     $rcv_cloud_run_deploy
     echo "Running RCV cloud run scheduler deployment"
-    # --schedule causes problems unless run as subshell
-    # $(gcloud scheduler jobs ${command} http clinvar-rcv-ftp-watcher-scheduler --location ${region} --schedule='50 * * * *' --uri=https://${region}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${project}/jobs/clinvar-rcv-ftp-watcher:run --http-method POST --oauth-service-account-email=cloudrun@${project}.iam.gserviceaccount.com)
-else
+    $scheduler_command --schedule='50 * * * *'
+elif [[ ${instance} =~ ^.*vcv.*$ ]]; then
     echo "Running the VCV watcher deployment..."
     $vcv_cloud_run_deploy
     echo "Running VCV cloud run scheduler deployment"
-    # --schedule causes problems unless run as subshell
-    # $(gcloud scheduler jobs ${command} http clinvar-vcv-ftp-watcher-scheduler --location ${region} --schedule='45 * * * *' --uri=https://${region}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${project}/jobs/clinvar-vcv-ftp-watcher:run --http-method POST --oauth-service-account-email=cloudrun@${project}.iam.gserviceaccount.com)
+    $scheduler_command --schedule='45 * * * *'
+elif [[ ${instance} =~ ^.*somatic.*$ ]]; then
+    echo "Running the somatic watcher deployment..."
+    $vcv_cloud_run_deploy
+    echo "Running somatic cloud run scheduler deployment"
+    $scheduler_command --schedule='55 * * * *'
 fi
 echo "Deployment complete."

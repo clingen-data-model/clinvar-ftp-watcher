@@ -52,3 +52,15 @@ jobs:
         run: |
           bash misc/bin/deploy-job.sh
 
+      - name: set env vars somatic
+        run: |
+          export branch=${{ github.event.workflow_run.head_branch }}
+          export commit=${{ github.event.workflow_run.head_sha }}
+          echo "branch=$branch" >> $GITHUB_ENV
+          echo "commit=$commit" >> $GITHUB_ENV
+          echo "instance=clinvar-somatic-ftp-watcher" >> $GITHUB_ENV
+
+      - name: build and deploy somatic
+        run: |
+          bash misc/bin/deploy-job.sh
+
