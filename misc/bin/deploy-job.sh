@@ -112,7 +112,7 @@ elif [[ ${instance} =~ ^.*vcv.*$ ]]; then
     $scheduler_command --schedule='45 * * * *'
 elif [[ ${instance} =~ ^.*somatic.*$ ]]; then
     echo "Running the somatic watcher deployment..."
-    $vcv_cloud_run_deploy
+    $somatic_cloud_run_deploy
     echo "Running somatic cloud run scheduler deployment"
     $scheduler_command --schedule='55 * * * *'
 fi
