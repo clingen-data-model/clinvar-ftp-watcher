@@ -95,7 +95,7 @@ scheduler_command="gcloud scheduler jobs ${command} http ${instance} \
     --location ${region} \
     --uri=https://${region}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${project}/jobs/${instance}:run \
     --http-method POST \
-    --oauth-service-account-email=cloudrun@${project}.iam.gserviceaccount.com"
+    --oauth-service-account-email=clinvar-ftp-watcher-deployment@clingen-dev.iam.gserviceaccount.com"
 
 # turn on echo turn of filename expansion of wildcards
 set +e -f
