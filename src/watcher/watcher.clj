@@ -74,7 +74,7 @@
   [& args]
   (let [write-to-kafka (= -1 (if (some? args) (.indexOf args "--kafka") -1))
         initiate-job (= -1 (if (some? args) (.indexOf args "--job") -1))
-        files (-> (stream/get-last-processed)
+        files  (-> (stream/get-last-processed)
                   get-last-processed-date
                   get-latest-files-since)
         file-details (process-file-details files)
@@ -107,4 +107,10 @@
 
 
 (comment
-  (-> (ftpparse/ftp-since #inst "2024-06-01")))
+  (-> (ftpparse/ftp-since #inst "2024-07-01")))
+
+(comment
+  (-> (stream/get-last-processed)
+                  get-last-processed-date
+                  get-latest-files-since
+                  ))
