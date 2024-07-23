@@ -89,7 +89,7 @@ somatic_cloud_run_deploy="${vcv_cloud_run_deploy} \
     --set-env-vars=NCBI_CLINVAR_WEEKLY_FTP_DIR=/pub/clinvar/xml/weekly_release \
     --set-env-vars=NCBI_CLINVAR_FILE_NAME_BASE=ClinVarVCVRelease \
     --set-env-vars=GCP_WORKFLOW_LOCATION=${region} \
-    --set-env-vars=GCP_WORKFLOW_NAME=clinvar-somatic-ingest"
+    --set-env-vars=GCP_WORKFLOW_NAME=clinvar-ingest-copy-only"
 
 scheduler_command="gcloud scheduler jobs ${command} http ${instance} \
     --location ${region} \
