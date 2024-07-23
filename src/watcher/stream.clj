@@ -91,5 +91,6 @@
 
 (comment
   (get-last-processed)
-  (save-to-topic (str (java.util.Date.)) (json/write-str [{"Name" "ClinVarRCVRelease_2024-0610.xml.gz", "Size" 4342574098, "Released" "2024-06-12 08:12:12", "Last Modified" "2024-06-12 08:12:12", "Directory" "/pub/clinvar/xml/RCV_release/weekly_release", "Host" "https://ftp.ncbi.nlm.nih.gov", "Release Date" "2024-06-12"}])))
+  (save-to-topic (str (java.util.Date.)) (json/write-str [{"Name" "ClinVarVCVRelease_2024-0716.xml.gz", "Size" 3964266964, "Released" "2024-07-17 02:57:18", "Last Modified" "2024-07-17 02:57:18", "Directory" "/pub/clinvar/xml/weekly_release", "Host" "https://ftp.ncbi.nlm.nih.gov", "Release Date" "2024-07-16"}])))
+
 

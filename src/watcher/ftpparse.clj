@@ -187,5 +187,5 @@
     (->> weekly-ftp-url fetch-ftp parse-ftp rest (filter (every-pred since? filename?)) vec)))
 
 (comment
-  (ftp-since #inst "2024-06-01"))
+  (ftp-since #inst "2024-07-01"))
 
