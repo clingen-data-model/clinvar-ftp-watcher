@@ -8,8 +8,8 @@
 
 
 (def DEFAULT_GCP_PROJECT_ID "clingen-dev")
-(def DEFAULT_GCP_LOCATION "us-east1") 
-(def DEFAULT_GCP_JOB_NAME "clinvar-ingest")
+(def DEFAULT_GCP_WORKFLOW_LOCATION "us-east1") 
+(def DEFAULT_GCP_WORKFLOW_NAME "clinvar-vcv-ingest")
 
 ;; TODO s/b a macro?
 (defn gcp-project-id []
@@ -19,15 +19,15 @@
       project-id)))
 
 (defn gcp-location []
-  (let [location (System/getenv "GCP_LOCATION")]
+  (let [location (System/getenv "GCP_WORKFLOW_LOCATION")]
     (if (nil? location)
-      DEFAULT_GCP_LOCATION
+      DEFAULT_GCP_WORKFLOW_LOCATION
       location)))
 
 (defn gcp-job-name []
-  (let [job-name (System/getenv "GCP_JOB_NAME")]
+  (let [job-name (System/getenv "GCP_WORKFLOW_NAME")]
     (if (nil? job-name)
-      DEFAULT_GCP_JOB_NAME
+      DEFAULT_GCP_WORKFLOW_NAME
       job-name)))
 
 
