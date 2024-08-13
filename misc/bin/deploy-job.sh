@@ -73,7 +73,9 @@ vcv_cloud_run_deploy="gcloud run jobs ${command} ${instance} \
     --max-retries=0 \
     --region=${region} \
     --service-account=${deployment_service_account} \
-    --set-secrets=DX_JAAS_CONFIG=dx-prod-jaas:latest"
+    --set-secrets=DX_JAAS_CONFIG=dx-prod-jaas:latest \
+    --set-secrets=CLINVAR_FTP_WATCHER_SLACK_BOT_TOKEN=clinvar-ingest-slack-token:latest \
+    --set-env-vars=CLINVAR_FTP_WATCHER_SLACK_CHANNEL=C06QFR0278D"
 
 # override variant biased env vars with rcv specifics
 rcv_cloud_run_deploy="${vcv_cloud_run_deploy} \

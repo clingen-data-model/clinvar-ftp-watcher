@@ -2,6 +2,7 @@
   "Source for cloud function that periodicly watches the clivar ftp dir
   for new files. State is maintained in a kafka topic."
   (:require [watcher.ftpparse     :as ftpparse]
+            [watcher.slack        :refer [post-slack-message-or-throw]]
             [watcher.stream       :as stream]
             [watcher.util         :as util]
             [watcher.cloudrunjob  :as job]
@@ -78,8 +79,11 @@
                   get-last-processed-date
                   get-latest-files-since)
         file-details (process-file-details files)
-        date-processed (str (Date.))]
-    (info (str "Run on " date-processed " processed " (count (:files files)) " files."))
+        date-processed (str (Date.))
+        workflow-job-name (job/gcp-job-name)
+        message (str "FTP Watcher run on " date-processed " found " (count (:files files))
+                     " files to be processed by " workflow-job-name ".")]
+    (info message)
     (when (new-files? files)
       (if write-to-kafka
         (do
@@ -87,17 +91,16 @@
           (info "Updated kafka topic with new file details."))
         (info "No new file information written to kafka."))
       (if initiate-job
+        (post-slack-message-or-throw message)
         (doseq [release-map file-details]
-          ;; Dereferencing this future will cause this process to wait for future completion.
-          ;; since this is running as a cloud run job if we wait, gcp will kill this process with:
-          ;; "WARNING: The task has been cancelled. Please refer to
-          ;;     https://github.com/googleapis/google-cloud-java#lro-timeouts for more information"
-          ;; Waiting for the future to complete will require adding JobsSettings
-          ;; https://cloud.google.com/java/docs/reference/google-cloud-run/latest/com.google.cloud.run.v2.JobsClient#com_google_cloud_run_v2_JobsClient_JobsClient_com_google_cloud_run_v2_JobsSettings_
-          ;;
-          (let [initiated-job (future (job/initiate-cloud-run-job release-map))]
-            (info "Initiated cloud run job " (job/gcp-job-name) " with payload " release-map)))
-        (info "Cloud run job not initiated.")))))
+          (try
+            ;; Dereferencing this future will cause this process to wait for future completion.
+            (let [initiated-job (future (job/initiate-cloud-run-job release-map))]
+              (info "Initiated cloud run job " workflow-job-name " with payload " release-map)))
+          (catch Throwable t
+            (let [message (str "Error invoking " workflow-job-name " with payload " release-map ".")]
+              (post-slack-message-or-throw message)))))
+      (info "Cloud run job not initiated.")))))
 
 
 (comment
