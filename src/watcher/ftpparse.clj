@@ -84,11 +84,11 @@
 
 (def ftp-time
   "This is how the FTP site timestamps."
-  (SimpleDateFormat. "yyyy-MM-dd kk:mm:ss"))
+  (SimpleDateFormat. "yyyy-MM-dd HH:mm:ss"))
 
 (def ftp-time-ymdhm
   "And sometimes THIS is how the FTP site timestamps."
-  (SimpleDateFormat. "yyyy-MM-dd kk:mm"))
+  (SimpleDateFormat. "yyyy-MM-dd HH:mm"))
 
 (def ftp-time-ymd
   "And sometimes THIS is how the FTP site timestamps."

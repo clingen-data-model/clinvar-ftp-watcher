@@ -63,9 +63,10 @@
 (defn post-slack-message-or-throw
   "Post `message` to `channel` and throw if response indicates a failure."
   [message]
-  (let [response (post-slack-message message)]
-    (when-not (:ok response)
-      (throw (ex-info "Slack API chat.postMessage failed"
-                      {:message  message
-                       :response response})))
-    response))
+  (when (and @slack-channel @slack-bot-token)
+    (let [response (post-slack-message message)]
+      (when-not (:ok response)
+        (throw (ex-info "Slack API chat.postMessage failed"
+                        {:message  message
+                         :response response})))
+      response)))
