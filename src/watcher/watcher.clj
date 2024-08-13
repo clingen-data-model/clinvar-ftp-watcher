@@ -76,8 +76,8 @@
   (let [write-to-kafka (= -1 (if (some? args) (.indexOf args "--kafka") -1))
         initiate-job (= -1 (if (some? args) (.indexOf args "--job") -1))
         files  (-> (stream/get-last-processed)
-                  get-last-processed-date
-                  get-latest-files-since)
+                   get-last-processed-date
+                   get-latest-files-since)
         file-details (process-file-details files)
         date-processed (str (Date.))
         workflow-job-name (job/gcp-job-name)
@@ -91,16 +91,17 @@
           (info "Updated kafka topic with new file details."))
         (info "No new file information written to kafka."))
       (if initiate-job
-        (post-slack-message-or-throw message)
-        (doseq [release-map file-details]
-          (try
-            ;; Dereferencing this future will cause this process to wait for future completion.
-            (let [initiated-job (future (job/initiate-cloud-run-job release-map))]
-              (info "Initiated cloud run job " workflow-job-name " with payload " release-map)))
-          (catch Throwable t
-            (let [message (str "Error invoking " workflow-job-name " with payload " release-map ".")]
-              (post-slack-message-or-throw message)))))
-      (info "Cloud run job not initiated.")))))
+        (do
+          (post-slack-message-or-throw message)
+          (doseq [release-map file-details]
+            (try
+              ;; Dereferencing this future will cause this process to wait for future completion.
+              (let [initiated-job (future (job/initiate-cloud-run-job release-map))]
+                (info "Initiated cloud run job " workflow-job-name " with payload " release-map))
+              (catch Throwable t
+                (let [message (str "Error invoking " workflow-job-name " with payload " release-map ".")]
+                  (post-slack-message-or-throw message))))))
+        (info "Cloud run job not initiated.")))))
 
 
 (comment
