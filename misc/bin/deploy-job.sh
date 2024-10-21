@@ -86,12 +86,12 @@ rcv_cloud_run_deploy="${vcv_cloud_run_deploy} \
     --set-env-vars=GCP_WORKFLOW_NAME=clinvar-rcv-ingest"
 
 # override variant biased env vars with somatic specifics
-somatic_cloud_run_deploy="${vcv_cloud_run_deploy} \
+vcv_new_cloud_run_deploy="${vcv_cloud_run_deploy} \
     --set-env-vars=CLINVAR_FTP_WATCHER_TOPIC=clinvar-somatic-ftp-watcher \
     --set-env-vars=NCBI_CLINVAR_WEEKLY_FTP_DIR=/pub/clinvar/xml/weekly_release \
     --set-env-vars=NCBI_CLINVAR_FILE_NAME_BASE=ClinVarVCVRelease \
     --set-env-vars=GCP_WORKFLOW_LOCATION=${region} \
-    --set-env-vars=GCP_WORKFLOW_NAME=clinvar-ingest-copy-only"
+    --set-env-vars=GCP_WORKFLOW_NAME=clinvar-vcv-ingest-new"
 
 scheduler_command="gcloud scheduler jobs ${command} http ${instance} \
     --location ${region} \
@@ -102,20 +102,20 @@ scheduler_command="gcloud scheduler jobs ${command} http ${instance} \
 # turn on echo turn of filename expansion of wildcards
 set +e -f
 
-if [[ ${instance} =~ ^.*rcv.*$ ]]; then
+if [ ${instance} == "clinvar-rcv-ftp-watcher" ]; then
     echo "Running the RCV watcher deployment..."
     $rcv_cloud_run_deploy
     echo "Running RCV cloud run scheduler deployment"
     $scheduler_command --schedule='50 * * * *'
-elif [[ ${instance} =~ ^.*vcv.*$ ]]; then
+elif [ ${instance} == "clinvar-vcv-ftp-watcher" ]; then
     echo "Running the VCV watcher deployment..."
     $vcv_cloud_run_deploy
     echo "Running VCV cloud run scheduler deployment"
     $scheduler_command --schedule='45 * * * *'
-elif [[ ${instance} =~ ^.*somatic.*$ ]]; then
-    echo "Running the somatic watcher deployment..."
-    $somatic_cloud_run_deploy
-    echo "Running somatic cloud run scheduler deployment"
+elif [ ${instance} == "clinvar-vcv-ftp-watcher-new" ]; then
+    echo "Running the VCV watcher deployment..."
+    $vcv_new_cloud_run_deploy
+    echo "Running VCV NEW cloud run scheduler deployment"
     $scheduler_command --schedule='55 * * * *'
 fi
 echo "Deployment complete."
