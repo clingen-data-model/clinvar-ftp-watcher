@@ -2,7 +2,7 @@
 # Build and deploy this project source code as a GCP cloud run job.
 #
 # Usage: shell> instance="clinvar-vcv-ftp-watcher" sh ./misc/bin//deploy-job.sh
-#    or: shell> instance="clinvar-rcv-ftp-watcher-xxx" sh ./misc/bin/deploy-job.sh           
+#    or: shell> instance="clinvar-rcv-ftp-watcher-xxx" sh ./misc/bin/deploy-job.sh
 
 set -xo pipefail
 
@@ -66,8 +66,7 @@ else
     command="create"
 fi
 
-# clinvar_ftp_watcher env defaults are variant biased
-vcv_cloud_run_deploy="gcloud run jobs ${command} ${instance} \
+cloud_run_cmd_common="gcloud run jobs ${command} ${instance} \
     --cpu=1 \
     --image=$image \
     --max-retries=0 \
@@ -77,21 +76,28 @@ vcv_cloud_run_deploy="gcloud run jobs ${command} ${instance} \
     --set-secrets=CLINVAR_FTP_WATCHER_SLACK_BOT_TOKEN=clinvar-ingest-slack-token:latest \
     --set-env-vars=CLINVAR_FTP_WATCHER_SLACK_CHANNEL=C06QFR0278D"
 
+## VCV (old)
+# clinvar_ftp_watcher env defaults are variant biased
+vcv_cloud_run_deploy="${cloud_run_cmd_common} \
+    --set-env-vars=GCP_WORKFLOW_NAME=clinvar-ingest-copy-only-v1"
+
+## RCV (current)
 # override variant biased env vars with rcv specifics
-rcv_cloud_run_deploy="${vcv_cloud_run_deploy} \
+rcv_cloud_run_deploy="${cloud_run_cmd_common} \
     --set-env-vars=CLINVAR_FTP_WATCHER_TOPIC=clinvar-rcv-ftp-watcher \
     --set-env-vars=NCBI_CLINVAR_WEEKLY_FTP_DIR=/pub/clinvar/xml/RCV_release/weekly_release \
     --set-env-vars=NCBI_CLINVAR_FILE_NAME_BASE=ClinVarRCVRelease \
     --set-env-vars=GCP_WORKFLOW_LOCATION=${region} \
     --set-env-vars=GCP_WORKFLOW_NAME=clinvar-rcv-ingest"
 
+## VCV (current)
 # override variant biased env vars with somatic specifics
-vcv_new_cloud_run_deploy="${vcv_cloud_run_deploy} \
+vcv_new_cloud_run_deploy="${cloud_run_cmd_common} \
     --set-env-vars=CLINVAR_FTP_WATCHER_TOPIC=clinvar-somatic-ftp-watcher \
     --set-env-vars=NCBI_CLINVAR_WEEKLY_FTP_DIR=/pub/clinvar/xml/weekly_release \
     --set-env-vars=NCBI_CLINVAR_FILE_NAME_BASE=ClinVarVCVRelease \
     --set-env-vars=GCP_WORKFLOW_LOCATION=${region} \
-    --set-env-vars=GCP_WORKFLOW_NAME=clinvar-vcv-ingest-new"
+    --set-env-vars=GCP_WORKFLOW_NAME=clinvar-vcv-ingest"
 
 scheduler_command="gcloud scheduler jobs ${command} http ${instance} \
     --location ${region} \
@@ -99,7 +105,7 @@ scheduler_command="gcloud scheduler jobs ${command} http ${instance} \
     --http-method POST \
     --oauth-service-account-email=clinvar-ftp-watcher-deployment@clingen-dev.iam.gserviceaccount.com"
 
-# turn on echo turn of filename expansion of wildcards
+# turn on echo turn off filename expansion of wildcards
 set +e -f
 
 if [ ${instance} == "clinvar-rcv-ftp-watcher" ]; then
