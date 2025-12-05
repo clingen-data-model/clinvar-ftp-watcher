@@ -13,8 +13,6 @@ fi
 echo "Branch: $branch"
 echo "Commit: $commit"
 
-set -ue
-
 clinvar_ftp_watcher_bucket="clinvar-ftp-watcher"
 region="us-east1"
 project=$(gcloud config get project)
@@ -36,6 +34,6 @@ tar --no-xattrs -c \
 
 gcloud builds submit \
     --substitutions="COMMIT_SHA=${commit}" \
-    --config .cloudbuild/docker-build-dev.cloudbuild.yaml \
+    --config $cloudbuild
     --gcs-log-dir=gs://$clinvar_ftp_watcher_bucket/build/logs \
     archive.tar.gz
