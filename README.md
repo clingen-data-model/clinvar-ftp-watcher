@@ -19,7 +19,7 @@ This code has been deployed as a cloud run job named 'clinvar-vcv-ftp-watcher' a
 
 A new build requires an edit to the cloud run job to update the container image.
 - Go to cloud run page - https://console.cloud.google.com/run/jobs?orgonly=true&project=clingen-dev&supportedpurview=organizationId
-Build (build.sh) and deploy (deploy_jobs.sh) scripts can be found in the misc/bin directory.
+Build and deploy (deploy_job.sh) script can be found in the misc/bin directory. It is executed automatically by the github action in .github/workflows.
 
 Environment Variables:
 
