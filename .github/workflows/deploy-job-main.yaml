@@ -30,8 +30,7 @@ jobs:
 
       - name: set vars for clinvar-ftp-watcher build
         run: |
-          export commit=${{ github.event.workflow_run.head_sha }}
-          echo "commit=$commit" >> $GITHUB_ENV
+          echo "commit=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_ENV
 
       - name: build clinvar-ftp-watcher image
         run: |
@@ -39,8 +38,6 @@ jobs:
 
       - name: set env vars vcv
         run: |
-          export commit=${{ github.event.workflow_run.head_sha }}
-          echo "commit=$commit" >> $GITHUB_ENV
           echo "instance=clinvar-vcv-ftp-watcher" >> $GITHUB_ENV
 
       - name: deploy vcv
@@ -49,8 +46,6 @@ jobs:
 
       - name: set env vars rcv
         run: |
-          export commit=${{ github.event.workflow_run.head_sha }}
-          echo "commit=$commit" >> $GITHUB_ENV
           echo "instance=clinvar-rcv-ftp-watcher" >> $GITHUB_ENV
 
       - name: deploy rcv
@@ -59,8 +54,6 @@ jobs:
 
       - name: set env vars vcv new
         run: |
-          export commit=${{ github.event.workflow_run.head_sha }}
-          echo "commit=$commit" >> $GITHUB_ENV
           echo "instance=clinvar-vcv-ftp-watcher-new" >> $GITHUB_ENV
 
       - name: deploy vcv new
