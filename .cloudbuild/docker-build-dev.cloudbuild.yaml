@@ -4,14 +4,14 @@
 # gcloud builds submit --project=clingen-dev --config ./cloudbuild/docker-build-dev.cloudbuild.yaml \
 #  --substitutions=COMMIT_SHA="testbuild" .
 
-# Builds genegraph and tags for dev image repository
+# Builds ftp watcher and tags for dev image repository
 steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: [ 'build', '.', '-t', 'clinvar-ftp-watcher:$COMMIT_SHA']
 - name: 'gcr.io/cloud-builders/docker'
   args: [ 'tag', 'clinvar-ftp-watcher:$COMMIT_SHA', 'gcr.io/clingen-dev/clinvar-ftp-watcher:$COMMIT_SHA']
 
-# push the images
+# push the image to gcr.io
 images:
   - 'gcr.io/clingen-dev/clinvar-ftp-watcher:$COMMIT_SHA'
 

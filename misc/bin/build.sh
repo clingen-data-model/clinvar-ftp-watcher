@@ -10,17 +10,11 @@ else
     echo "commit set in environment"
 fi
 
-echo "Branch: $branch"
-echo "Commit: $commit"
-
 clinvar_ftp_watcher_bucket="clinvar-ftp-watcher"
-region="us-east1"
-project=$(gcloud config get project)
-image=gcr.io/clingen-dev/clinvar-ftp-watcher:$commit
 
 
 ################################################################
-# Build the image
+# Build the image as clinvar-fpt-watcher:SHA
 cloudbuild=.cloudbuild/docker-build-dev.cloudbuild.yaml
 
 tar --no-xattrs -c \

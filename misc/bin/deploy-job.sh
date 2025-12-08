@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Build and deploy this project source code as a GCP cloud run job.
+# Deploy the clinvar-ftp-watcher image (assumes this was built in a previous step with build.sh)
+# and project env as a GCP cloud run job.
 #
 # Usage: shell> instance="clinvar-vcv-ftp-watcher" sh ./misc/bin//deploy-job.sh
 #    or: shell> instance="clinvar-rcv-ftp-watcher-xxx" sh ./misc/bin/deploy-job.sh
@@ -12,9 +13,9 @@ if [ -z "$instance" ]; then
     exit -1
 fi
 
-echo "${instance}" | egrep -i "vcv|rcv|somatic" > /dev/null
+echo "${instance}" | egrep -i "vcv|rcv" > /dev/null
 if [ $? -ne 0 ]; then
-    echo "'instance' must have 'rcv', 'vcv' or 'somatic' in the name."
+    echo "'instance' must have 'rcv' or 'vcv' in the name."
     exit -1
 fi
 
@@ -24,37 +25,16 @@ else
     echo "commit set in environment"
 fi
 
-echo "Branch: $branch"
 echo "Commit: $commit"
 echo "Instance name: $instance"
 
 set -ue
 
-clinvar_ftp_watcher_bucket="clinvar-ftp-watcher"
 region="us-east1"
 project=$(gcloud config get project)
 image=gcr.io/clingen-dev/clinvar-ftp-watcher:$commit
 deployment_service_account=clinvar-ftp-watcher-deployment@clingen-dev.iam.gserviceaccount.com
 
-
-################################################################
-# Build the image
-cloudbuild=.cloudbuild/docker-build-dev.cloudbuild.yaml
-
-tar --no-xattrs -c \
-    Dockerfile \
-    build.clj \
-    deps.edn \
-    misc \
-    src \
-    .cloudbuild \
-    | gzip --fast > archive.tar.gz
-
-gcloud builds submit \
-    --substitutions="COMMIT_SHA=${commit}" \
-    --config .cloudbuild/docker-build-dev.cloudbuild.yaml \
-    --gcs-log-dir=gs://$clinvar_ftp_watcher_bucket/build/logs \
-    archive.tar.gz
 
 ################################################################
 # Deploy job
