@@ -1,5 +1,5 @@
 name: Deploy Job
-run-name: Deploy ${{ github.event.workflow_run.head_branch }} by @${{ github.actor }}
+run-name: Deploy ${{ github.ref_name }} by @${{ github.actor }}
 
 on:
   push:
@@ -15,8 +15,6 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.workflow_run.head_branch }}
 
       - name: authenticate to google cloud
         id: "auth"
@@ -30,7 +28,7 @@ jobs:
 
       - name: set vars for clinvar-ftp-watcher build
         run: |
-          echo "commit=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_ENV
+          echo "commit=${{ github.sha }}" >> $GITHUB_ENV
 
       - name: build clinvar-ftp-watcher image
         run: |
