@@ -28,6 +28,6 @@ tar --no-xattrs -c \
 
 gcloud builds submit \
     --substitutions="COMMIT_SHA=${commit}" \
-    --config $cloudbuild
+    --config $cloudbuild \
     --gcs-log-dir=gs://$clinvar_ftp_watcher_bucket/build/logs \
     archive.tar.gz
